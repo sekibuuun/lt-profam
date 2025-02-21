@@ -48,10 +48,17 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
     }
   }
 
+  const rawProps = getRootProps();
+  const cleanProps: Omit<typeof rawProps, 'onDrag' | 'onAnimationStart' | 'onDragEnd' | 'onDragStart'> = { ...rawProps };
+  delete cleanProps.onDrag;
+  delete cleanProps.onAnimationStart;
+  delete cleanProps.onDragEnd;
+  delete cleanProps.onDragStart;
+
   return (
     <div className="space-y-4">
       <motion.div
-        {...getRootProps()}
+        {...cleanProps}
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
           isDragActive ? "border-pink-300 bg-pink-50" : "border-blue-200"
         }`}
@@ -85,4 +92,3 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
     </div>
   )
 }
-
