@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { db } from '@/db/drizzle';
-import { invites } from '@/db/schema';
+import { files, invites } from '@/db/schema';
 import { v4 as uuidv4 } from 'uuid';
 import { eq } from 'drizzle-orm';
+import { FileData } from '@/app/types';
 
 /**
  * PDFファイルをDBに保存する関数
@@ -41,28 +42,21 @@ export async function isValidInvite(code: string): Promise<boolean> {
   return invite.length > 0;
 }
 
-export type FileData = {
-  id: string;
-  name: string;
-  data?: Buffer;
-  uploadedAt: Date;
-  content?: string;
-};
 
-export async function updateFileName({ id, newName }: { id: string; newName: string }): Promise<void> {
+
+export async function updateFileName({ id, newName }: { id: number; newName: string }): Promise<void> {
   void id;
   void newName;
   // ダミー実装: ファイル名を更新する処理
 }
 
-export async function deleteFile({ id }: { id: string }): Promise<void> {
+export async function deleteFile({ id }: { id: number }): Promise<void> {
   void id;
   // ダミー実装: ファイルを削除する処理
 }
 
-export async function saveInvite({ invite, inviteId }: { invite: FileData[]; inviteId: number }): Promise<void> {
-  void inviteId;
-  void invite;
+export async function saveInvite({ id }: { id: number }): Promise<void> {
+  void id;
   // ダミー実装: 招待情報を保存する処理
 };
 
@@ -76,12 +70,7 @@ export async function saveInvite({ invite, inviteId }: { invite: FileData[]; inv
  *   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
  * });
  */
-export type Invite = {
-  id: number;
-  code: string;
-  used: boolean;
-  createdAt: string;
-};
+
 
 /**
  * 新たに招待情報を作成する関数
@@ -103,4 +92,14 @@ export async function createInvite(): Promise<string> {
   }
 
   return firstResult.code;
+}
+
+export async function getFiles(code: string): Promise<FileData[]> {
+  const id = await getInviteId(code);
+  const result = await db.select()
+    .from(files)
+    .where(eq(files.id, id))
+    .limit(1);
+
+  return result;
 }
