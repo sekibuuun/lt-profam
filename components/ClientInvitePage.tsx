@@ -1,51 +1,43 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
-import FileUpload from "@/components/file-upload"
+import { useState } from "react"
+import FileUpload  from "@/components/file-upload"
 import FileList from "@/components/file-list"
 import SlideViewer from "@/components/slide-viewer"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { getInvite, type FileData, updateFileName, deleteFile, saveInvite } from "@/lib/db"
+import { updateFileName, deleteFile, saveInvite } from "@/lib/db"
 import { motion } from "framer-motion"
+import { FileData } from "@/app/types"
 
-export default function InvitePage() {
-  const { inviteId } = useParams()
-  const [files, setFiles] = useState<FileData[]>([])
+export default function ClientInvitePage({ initialFiles }: { initialFiles: FileData[]}) {
+  const [files, setFiles] = useState<FileData[]>(initialFiles)
   const [viewingFile, setViewingFile] = useState<FileData | null>(null)
 
-  useEffect(() => {
-    const invite = getInvite(inviteId as string)
-    if (invite) {
-      setFiles(invite.files)
-    }
-  }, [inviteId])
-
-  const handleUpload = (file: FileData) => {
-    const updatedFiles = [...files, file]
-    setFiles(updatedFiles)
-    saveInvite(inviteId as string, updatedFiles)
-  }
-
-  const handleDelete = (fileId: string) => {
+  const handleDelete = async (fileId: number) => {
     const updatedFiles = files.filter((f) => f.id !== fileId)
     setFiles(updatedFiles)
-    deleteFile(inviteId as string, fileId)
-    saveInvite(inviteId as string, updatedFiles)
+    await deleteFile({ id: fileId })
+    await saveInvite({ id: fileId })
   }
 
-  const handleRename = (fileId: string, newName: string) => {
+  const handleRename = async (fileId: number, newName: string) => {
     const updatedFiles = files.map((f) => (f.id === fileId ? { ...f, name: newName } : f))
     setFiles(updatedFiles)
-    updateFileName(inviteId as string, fileId, newName)
-    saveInvite(inviteId as string, updatedFiles)
+    await updateFileName({ id: fileId, newName })
+    await saveInvite({ id: fileId })
   }
 
-  const handleView = (fileId: string) => {
+  const handleView = (fileId: number) => {
     const file = files.find((f) => f.id === fileId)
     if (file) {
       setViewingFile(file)
     }
+  }
+
+  const handleUpload = async (fileId: number, newFile: FileData) => {
+    const updatedFiles = [...files, newFile]
+    setFiles(updatedFiles)
+    await saveInvite({ id: fileId })
   }
 
   return (
@@ -61,7 +53,7 @@ export default function InvitePage() {
           </CardContent>
         </Card>
       </motion.div>
-      {viewingFile && <SlideViewer pdfContent={viewingFile.content} onClose={() => setViewingFile(null)} />}
+      {viewingFile && <SlideViewer pdfContent={viewingFile} onClose={() => setViewingFile(null)} />}
     </main>
   )
 }

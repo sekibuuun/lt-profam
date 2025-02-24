@@ -5,11 +5,12 @@ import { Document, Page, pdfjs } from "react-pdf"
 import { Button } from "@/components/ui/button"
 import { X, ChevronLeft, ChevronRight, Maximize, Minimize } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { FileData } from "@/app/types"
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
 interface SlideViewerProps {
-  pdfContent: string
+  pdfContent: FileData
   onClose: () => void
 }
 
