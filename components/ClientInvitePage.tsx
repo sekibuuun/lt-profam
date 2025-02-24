@@ -5,43 +5,39 @@ import FileUpload  from "@/components/file-upload"
 import FileList from "@/components/file-list"
 import SlideViewer from "@/components/slide-viewer"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { type FileData, updateFileName, deleteFile, saveInvite } from "@/lib/db"
+import { updateFileName, deleteFile, saveInvite } from "@/lib/db"
 import { motion } from "framer-motion"
+import { FileData } from "@/app/types"
 
-interface ClientInvitePageProps {
-  initialFiles: FileData[]
-  inviteId: number
-}
-
-export default function ClientInvitePage({ initialFiles, inviteId }: ClientInvitePageProps) {
+export default function ClientInvitePage({ initialFiles }: { initialFiles: FileData[]}) {
   const [files, setFiles] = useState<FileData[]>(initialFiles)
   const [viewingFile, setViewingFile] = useState<FileData | null>(null)
 
-  const handleDelete = async (fileId: string) => {
+  const handleDelete = async (fileId: number) => {
     const updatedFiles = files.filter((f) => f.id !== fileId)
     setFiles(updatedFiles)
     await deleteFile({ id: fileId })
-    await saveInvite({ invite: updatedFiles, inviteId })
+    await saveInvite({ id: fileId })
   }
 
-  const handleRename = async (fileId: string, newName: string) => {
+  const handleRename = async (fileId: number, newName: string) => {
     const updatedFiles = files.map((f) => (f.id === fileId ? { ...f, name: newName } : f))
     setFiles(updatedFiles)
     await updateFileName({ id: fileId, newName })
-    await saveInvite({ invite: updatedFiles, inviteId })
+    await saveInvite({ id: fileId })
   }
 
-  const handleView = (fileId: string) => {
+  const handleView = (fileId: number) => {
     const file = files.find((f) => f.id === fileId)
     if (file) {
       setViewingFile(file)
     }
   }
 
-  const handleUpload = async (newFile: FileData) => {
+  const handleUpload = async (fileId: number, newFile: FileData) => {
     const updatedFiles = [...files, newFile]
     setFiles(updatedFiles)
-    await saveInvite({ invite: updatedFiles, inviteId })
+    await saveInvite({ id: fileId })
   }
 
   return (
@@ -57,7 +53,7 @@ export default function ClientInvitePage({ initialFiles, inviteId }: ClientInvit
           </CardContent>
         </Card>
       </motion.div>
-      {viewingFile && <SlideViewer pdfContent={viewingFile.content || ""} onClose={() => setViewingFile(null)} />}
+      {viewingFile && <SlideViewer pdfContent={viewingFile} onClose={() => setViewingFile(null)} />}
     </main>
   )
 }
