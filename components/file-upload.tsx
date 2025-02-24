@@ -5,11 +5,11 @@ import { useDropzone } from "react-dropzone"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import type { FileData } from "@/lib/db"
+import { FileData } from "@/app/types"
 import { motion } from "framer-motion"
 
 interface FileUploadProps {
-  onUpload: (file: FileData) => void
+  onUpload: (fileId: number, newFile: FileData) => Promise<void>
 }
 
 export default function FileUpload({ onUpload }: FileUploadProps) {
@@ -36,12 +36,8 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
       const reader = new FileReader()
       reader.onload = (e) => {
         const content = e.target?.result as string
-        onUpload({
-          id: Date.now().toString(),
-          name: fileName,
-          content: content.split(",")[1], // Remove data URL prefix
-          uploadedAt: new Date(),
-        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onUpload(0, { filename: fileName, content } as unknown as FileData)
         setFile(null)
         setFileName("")
       }

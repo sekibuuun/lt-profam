@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import type { FileData } from "@/lib/db"
+import { FileData } from "@/app/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Pencil, Trash2, X, Check, Eye } from "lucide-react"
@@ -9,18 +9,18 @@ import { motion, AnimatePresence } from "framer-motion"
 
 interface FileListProps {
   files: FileData[]
-  onDelete: (fileId: string) => void
-  onRename: (fileId: string, newName: string) => void
-  onView: (fileId: string) => void
+  onDelete: (fileId: number) => void
+  onRename: (fileId: number, newName: string) => void
+  onView: (fileId: number) => void
 }
 
 export default function FileList({ files, onDelete, onRename, onView }: FileListProps) {
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editingName, setEditingName] = useState("")
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editingName, setEditingName] = useState<string>("")
 
   const startEditing = (file: FileData) => {
     setEditingId(file.id)
-    setEditingName(file.name)
+    setEditingName(file.filename)
   }
 
   const cancelEditing = () => {
@@ -28,7 +28,7 @@ export default function FileList({ files, onDelete, onRename, onView }: FileList
     setEditingName("")
   }
 
-  const saveEditing = (fileId: string) => {
+  const saveEditing = (fileId: number) => {
     onRename(fileId, editingName)
     setEditingId(null)
     setEditingName("")
@@ -62,7 +62,7 @@ export default function FileList({ files, onDelete, onRename, onView }: FileList
               </div>
             ) : (
               <>
-                <span className="flex-grow text-gray-600">{file.name}</span>
+                <span className="flex-grow text-gray-600">{file.filename}</span>
                 <div className="flex items-center space-x-2">
                   <Button
                     size="icon"
