@@ -85,16 +85,15 @@ export async function createInvite(): Promise<string> {
   const result = await db.insert(invites).values({
     code: uuidv4(),
     createdAt: new Date().toISOString(),
-  }).returning({ code: invites.code });  // 明示的にcodeカラムを指定
+  }).returning();
 
-  // resultが配列の場合は最初の要素を取得
-  const firstResult = Array.isArray(result) ? result[0] : result;
+  const code = result[0]?.code;
 
-  if (!firstResult?.code) {
+  if (!code) {
     throw new Error('Failed to create invite code');
   }
 
-  return firstResult.code;
+  return code;
 }
 
 export async function getFiles(code: string): Promise<FileData[]> {
