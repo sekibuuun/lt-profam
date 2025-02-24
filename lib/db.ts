@@ -60,7 +60,8 @@ export async function deleteFile({ id }: { id: string }): Promise<void> {
   // ダミー実装: ファイルを削除する処理
 }
 
-export async function saveInvite({ invite }: { invite: unknown }): Promise<void> {
+export async function saveInvite({ invite, inviteId }: { invite: FileData[]; inviteId: number }): Promise<void> {
+  void inviteId;
   void invite;
   // ダミー実装: 招待情報を保存する処理
 };

@@ -40,6 +40,7 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
           id: Date.now().toString(),
           name: fileName,
           content: content.split(",")[1], // Remove data URL prefix
+          uploadedAt: new Date(),
         })
         setFile(null)
         setFileName("")

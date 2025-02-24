@@ -8,5 +8,5 @@ export default async function InvitePage({ params }: { params: { inviteCode: str
   }
   const id = await getInviteId(params.inviteCode);
   const invite = await getInvite(id);
-  return <ClientInvitePage initialFiles={invite.files}/>;
+  return <ClientInvitePage initialFiles={invite.files} inviteId={id}/>;
 }
