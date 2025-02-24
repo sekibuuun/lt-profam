@@ -30,7 +30,10 @@ export async function getInviteId(code: string): Promise<number> {
     .from(invites)
     .where(eq(invites.code, code))
     .limit(1);
-  return invite[0].id
+  if (!invite.length) {
+    throw new Error(`Invite code "${code}" not found`);
+  }
+  return invite[0].id;
 }
 
 export async function isValidInvite(code: string): Promise<boolean> {
