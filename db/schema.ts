@@ -2,7 +2,7 @@ import { text, timestamp, pgTable, serial, integer } from "drizzle-orm/pg-core";
 
 export const invites = pgTable("invites", {
   id: serial("id").primaryKey(),
-  code: text("code").notNull(),
+  code: text("code").notNull().unique(),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
 });
 
