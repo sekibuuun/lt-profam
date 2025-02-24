@@ -14,7 +14,7 @@ export default function NotFound() {
           <CardHeader>
             <CardTitle className="text-3xl font-bold text-center text-pink-400">ページが見つかりません</CardTitle>
           </CardHeader>
-          <CardContent className="text-center">
+          <CardContent className="text-center" aria-live="polite">
             <p className="text-lg text-gray-600 mb-4">
               申し訳ありませんが、お探しのページは存在しないか、移動した可能性があります。
             </p>
