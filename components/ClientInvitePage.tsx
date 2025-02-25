@@ -8,8 +8,11 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { updateFileName, deleteFile, saveInvite } from "@/lib/db"
 import { motion } from "framer-motion"
 import { FileData } from "@/app/types"
+import { useParams } from "next/navigation"
 
 export default function ClientInvitePage({ initialFiles }: { initialFiles: FileData[]}) {
+  const param = useParams()
+  const inviteCode = param.inviteCode as string
   const [files, setFiles] = useState<FileData[]>(initialFiles)
   const [viewingFile, setViewingFile] = useState<FileData | null>(null)
 
@@ -48,7 +51,7 @@ export default function ClientInvitePage({ initialFiles }: { initialFiles: FileD
             <CardTitle className="text-3xl font-bold text-center text-pink-400">共有スライド</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <FileUpload onUpload={handleUpload} />
+            <FileUpload inviteCode={inviteCode} onUpload={handleUpload} />
             <FileList files={files} onDelete={handleDelete} onRename={handleRename} onView={handleView} />
           </CardContent>
         </Card>
