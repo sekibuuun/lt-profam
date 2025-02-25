@@ -8,7 +8,8 @@ export const invites = pgTable("invites", {
 
 export const files = pgTable("files", {
   id: serial("id").primaryKey(),
-  filename: text("filename").notNull(),
+  name: text("name").notNull(),
+  url: text("url").notNull(),
   inviteId: integer("invite_id").references(() => invites.id).notNull(),
   uploadedAt: timestamp("uploaded_at", { mode: "string" }).defaultNow().notNull(),
 });
