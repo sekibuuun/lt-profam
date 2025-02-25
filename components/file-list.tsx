@@ -40,7 +40,7 @@ export default function FileList({ files, onDelete, onRename, onView }: FileList
       <AnimatePresence>
         {files.map((file) => (
           <motion.div
-            key={file.id}
+            key={`file-${file.id}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -97,4 +97,3 @@ export default function FileList({ files, onDelete, onRename, onView }: FileList
     </div>
   )
 }
-
