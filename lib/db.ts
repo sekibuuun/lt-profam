@@ -3,19 +3,16 @@ import { db } from '@/db/drizzle';
 import { files, invites } from '@/db/schema';
 import { v4 as uuidv4 } from 'uuid';
 import { eq } from 'drizzle-orm';
-import { FileData } from '@/app/types';
+import { FileData, FileState } from "@/app/types"
 
-/**
- * PDFファイルをDBに保存する関数
- * 注意: 保存先のテーブル "pdf_files" は事前に作成しておく必要があります。
- * Neon DBを使用して接続しています。
- */
-export async function insertPDFFile({ fileName, data, uploadedAt }: { fileName: string; data: Buffer; uploadedAt: Date; }) {
-  return await db.insert("pdf_files" as any).values({
-    fileName,
-    data,
-    uploadedAt,
-  });
+export async function insertPDFFile({ file, inviteCode }: { file: FileState; inviteCode: string }) {
+  const inviteId = await getInviteId(inviteCode);
+  return await db.insert(files).values({
+    url: file.blobResult?.url as string,
+    name: file.blobResult?.pathname as string,
+    uploadedAt: new Date().toISOString(),
+    inviteId,
+  })
 }
 
 // 以下は他の関数のダミー実装です
