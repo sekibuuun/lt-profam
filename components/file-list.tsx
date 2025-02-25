@@ -20,7 +20,7 @@ export default function FileList({ files, onDelete, onRename, onView }: FileList
 
   const startEditing = (file: FileData) => {
     setEditingId(file.id)
-    setEditingName(file.filename)
+    setEditingName(file.name)
   }
 
   const cancelEditing = () => {
@@ -40,7 +40,7 @@ export default function FileList({ files, onDelete, onRename, onView }: FileList
       <AnimatePresence>
         {files.map((file) => (
           <motion.div
-            key={file.id}
+            key={`file-${file.id}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -62,7 +62,7 @@ export default function FileList({ files, onDelete, onRename, onView }: FileList
               </div>
             ) : (
               <>
-                <span className="flex-grow text-gray-600">{file.filename}</span>
+                <span className="flex-grow text-gray-600">{file.name}</span>
                 <div className="flex items-center space-x-2">
                   <Button
                     size="icon"
@@ -97,4 +97,3 @@ export default function FileList({ files, onDelete, onRename, onView }: FileList
     </div>
   )
 }
-

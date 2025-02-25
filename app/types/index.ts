@@ -1,3 +1,5 @@
+import { PutBlobResult } from "@vercel/blob";
+
 export type Invite = {
   id: number;
   code: string;
@@ -6,7 +8,13 @@ export type Invite = {
 };
 export type FileData = {
   id: number;
-  filename: string;
+  name: string;
+  url: string;
   uploadedAt: string;
   inviteId: number;
 };
+export type FileState = {
+  file: File | null;           // 選択されたファイルオブジェクト
+  blobResult: PutBlobResult | null; // アップロード後のBlobの結果
+  isUploaded: boolean;         // アップロード完了フラグ
+}
