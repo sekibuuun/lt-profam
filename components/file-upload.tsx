@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, ChangeEvent } from "react"
 import { useDropzone } from "react-dropzone"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,6 +18,7 @@ export default function FileUpload({ inviteCode, onUpload }: FileUploadProps) {
   // 状態を統一して管理
   const [fileState, setFileState] = useState<FileState>({
     file: null,
+    name: "",
     blobResult: null,
     isUploaded: false
   });
@@ -28,6 +29,7 @@ export default function FileUpload({ inviteCode, onUpload }: FileUploadProps) {
       // ファイルが選択された時に状態を更新
       setFileState({
         file: acceptedFiles[0],
+        name: acceptedFiles[0].name, // ここで名前を初期化
         blobResult: null,
         isUploaded: false
       });
@@ -47,13 +49,15 @@ export default function FileUpload({ inviteCode, onUpload }: FileUploadProps) {
 
     try {
       setIsUploading(true);
-      // ファイル名が設定されていない場合は、元のファイル名を使用
-      const uploadFileName = fileState.file.name;
+      // 設定されたファイル名を使用
+      const uploadFileName = fileState.name || fileState.file.name;
+      
       // Vercel Blobの公式クライアントアップロード機能を使用
       const newBlob = await upload(uploadFileName, fileState.file, {
         access: 'public',
         handleUploadUrl: '/api/upload',
       });
+      
       // データベース操作をAPI経由で実行
       await fetch('/api/upload-pdf', {
         method: 'POST',
@@ -63,19 +67,16 @@ export default function FileUpload({ inviteCode, onUpload }: FileUploadProps) {
         body: JSON.stringify({
           file: {
             ...fileState,
+            name: fileState.name, // 名前を明示的に含める
             blobResult: newBlob
           },
           inviteCode
         }),
-    });
-      // アップロード成功時に状態を更新
-      setFileState({
-        file: fileState.file,
-        blobResult: newBlob,
-        isUploaded: true
       });
       // 成功したら、onUploadコールバックを呼び出す
       await onUpload(0, {
+        id: 0, // 一時的なID
+        name: fileState.name, // 修正: ユーザー指定の名前を使用
         filename: uploadFileName,
         content: newBlob.url,
         size: fileState.file.size,
@@ -85,6 +86,7 @@ export default function FileUpload({ inviteCode, onUpload }: FileUploadProps) {
       // アップロード完了後に入力をリセット
       setFileState({
         file: null,
+        name: "",
         blobResult: newBlob,
         isUploaded: true
       });
@@ -95,9 +97,11 @@ export default function FileUpload({ inviteCode, onUpload }: FileUploadProps) {
     }
   };
 
-  const handleFileNameChange = () => {
+  // 入力値の変更を処理する関数を修正
+  const handleFileNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFileState({
       ...fileState,
+      name: e.target.value // 入力値を保存
     });
   };
 
@@ -132,7 +136,7 @@ export default function FileUpload({ inviteCode, onUpload }: FileUploadProps) {
           </Label>
           <Input
             id="fileName"
-            value={fileState.file.name}
+            value={fileState.name} // fileState.file.name ではなく fileState.name を使用
             onChange={handleFileNameChange}
             placeholder="ファイル名を入力"
             className="bg-white"
