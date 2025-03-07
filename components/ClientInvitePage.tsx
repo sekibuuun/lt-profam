@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import FileUpload  from "@/components/file-upload"
+import { useState, useEffect } from "react"
+import FileUpload from "@/components/file-upload"
 import FileList from "@/components/file-list"
 import SlideViewer from "@/components/slide-viewer"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -10,11 +10,36 @@ import { motion } from "framer-motion"
 import { FileData } from "@/app/types"
 import { useParams } from "next/navigation"
 
-export default function ClientInvitePage({ initialFiles }: { initialFiles: FileData[]}) {
-  const param = useParams()
-  const inviteCode = param.inviteCode as string
-  const [files, setFiles] = useState<FileData[]>(initialFiles)
+export default function ClientInvitePage() {
+  const params = useParams()
+  const inviteCode = params.inviteCode as string
+  const [files, setFiles] = useState<FileData[]>([])
   const [viewingFile, setViewingFile] = useState<FileData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(`/api/files?code=${inviteCode}`)
+        
+        if (!response.ok) {
+          throw new Error('ファイルの取得に失敗しました')
+        }
+        
+        const data = await response.json()
+        setFiles(data)
+      } catch (error) {
+        console.error('ファイル取得エラー:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (inviteCode) {
+      fetchFiles()
+    }
+  }, [inviteCode])
 
   const handleDelete = async (fileId: number) => {
     const updatedFiles = files.filter((f) => f.id !== fileId)
@@ -51,8 +76,14 @@ export default function ClientInvitePage({ initialFiles }: { initialFiles: FileD
             <CardTitle className="text-3xl font-bold text-center text-pink-400">共有スライド</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <FileUpload inviteCode={inviteCode} onUpload={handleUpload} />
-            <FileList files={files} onDelete={handleDelete} onRename={handleRename} onView={handleView} />
+            {loading ? (
+              <div className="text-center py-4">ファイルを読み込み中...</div>
+            ) : (
+              <>
+                <FileUpload inviteCode={inviteCode} onUpload={handleUpload} />
+                <FileList files={files} onDelete={handleDelete} onRename={handleRename} onView={handleView} />
+              </>
+            )}
           </CardContent>
         </Card>
       </motion.div>
@@ -60,4 +91,3 @@ export default function ClientInvitePage({ initialFiles }: { initialFiles: FileD
     </main>
   )
 }
-
