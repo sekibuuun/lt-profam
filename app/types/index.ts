@@ -15,6 +15,7 @@ export type FileData = {
 };
 export type FileState = {
   file: File | null;           // 選択されたファイルオブジェクト
+  name: string;                // ファイル名
   blobResult: PutBlobResult | null; // アップロード後のBlobの結果
   isUploaded: boolean;         // アップロード完了フラグ
 }
