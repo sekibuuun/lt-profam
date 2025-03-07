@@ -94,11 +94,10 @@ export async function createInvite(): Promise<string> {
 }
 
 export async function getFiles(code: string): Promise<FileData[]> {
-  const id = await getInviteId(code);
+  const inviteId = await getInviteId(code);
   const result = await db.select()
     .from(files)
-    .where(eq(files.id, id))
-    .limit(1);
+    .where(eq(files.inviteId, inviteId))
 
   return result;
 }
