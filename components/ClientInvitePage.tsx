@@ -5,7 +5,7 @@ import FileUpload from "@/components/file-upload"
 import FileList from "@/components/file-list"
 import SlideViewer from "@/components/slide-viewer"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { deleteFile, saveInvite } from "@/lib/db"
+import { saveInvite } from "@/lib/db"
 import { motion } from "framer-motion"
 import { FileData } from "@/app/types"
 import { useParams } from "next/navigation"
@@ -42,10 +42,14 @@ export default function ClientInvitePage() {
   }, [inviteCode])
 
   const handleDelete = async (fileId: number) => {
-    const updatedFiles = files.filter((f) => f.id !== fileId)
-    setFiles(updatedFiles)
-    await deleteFile({ id: fileId })
-    await saveInvite({ id: fileId })
+    await fetch(`/api/files?code=${inviteCode}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: fileId }),
+    })
+    setFiles(files.filter((f) => f.id !== fileId))
   }
 
   const handleRename = async (fileId: number, newName: string) => {
