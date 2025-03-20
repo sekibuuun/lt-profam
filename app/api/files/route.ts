@@ -46,7 +46,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const files = await deleteFile({ id });
+    const files = await deleteFile({ id, inviteCode });
     return NextResponse.json(files);
   } catch (error) {
     console.error("ファイル削除エラー:", error);

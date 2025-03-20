@@ -42,14 +42,24 @@ export default function ClientInvitePage() {
   }, [inviteCode])
 
   const handleDelete = async (fileId: number) => {
-    await fetch(`/api/files?code=${inviteCode}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id: fileId }),
-    })
-    setFiles((prevFiles) => prevFiles.filter((f) => f.id !== fileId))
+    try {
+      const response = await fetch(`/api/files?code=${inviteCode}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: fileId }),
+      })
+
+      if (!response.ok) {
+        throw new Error('ファイルの削除に失敗しました')
+      }
+
+      setFiles((prevFiles) => prevFiles.filter((f) => f.id !== fileId))
+    }
+    catch (error) {
+      console.error('ファイル削除エラー:', error)
+    }
   }
 
   const handleRename = async (fileId: number, newName: string) => {
