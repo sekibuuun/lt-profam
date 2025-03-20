@@ -2,7 +2,7 @@
 import { db } from '@/db/drizzle';
 import { files, invites } from '@/db/schema';
 import { v4 as uuidv4 } from 'uuid';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { FileData, FileState } from "@/app/types"
 
 export async function insertPDFFile({ file, inviteCode }: { file: FileState; inviteCode: string }) {
@@ -53,9 +53,26 @@ export async function updateFileName({ id, newName }: { id: number; newName: str
   return file;
 }
 
-export async function deleteFile({ id }: { id: number }): Promise<void> {
-  void id;
-  // ダミー実装: ファイルを削除する処理
+export async function deleteFile({ id, inviteCode }: { id: number; inviteCode: string }): Promise<FileData[]> {
+  const inviteId = await getInviteId(inviteCode);
+  const fileCheck = await db.select()
+    .from(files)
+    .where(and(eq(files.id, id), eq(files.inviteId, inviteId)))
+    .limit(1);
+
+  if (!fileCheck.length) {
+    throw new Error(`File with ID ${id} not found or does not belong to this invite`);
+  }
+
+  const file = await db.delete(files)
+    .where(and(eq(files.id, id), eq(files.inviteId, inviteId)))
+    .returning();
+
+  if (!file.length) {
+    throw new Error(`File with ID ${id} not found`);
+  }
+
+  return file;
 }
 
 export async function saveInvite({ id }: { id: number }): Promise<void> {
