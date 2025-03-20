@@ -49,7 +49,7 @@ export default function ClientInvitePage() {
       },
       body: JSON.stringify({ id: fileId }),
     })
-    setFiles(files.filter((f) => f.id !== fileId))
+    setFiles((prevFiles) => prevFiles.filter((f) => f.id !== fileId))
   }
 
   const handleRename = async (fileId: number, newName: string) => {
