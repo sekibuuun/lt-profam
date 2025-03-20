@@ -44,10 +44,13 @@ export async function isValidInvite(code: string): Promise<boolean> {
 
 
 
-export async function updateFileName({ id, newName }: { id: number; newName: string }): Promise<void> {
-  void id;
-  void newName;
-  // ダミー実装: ファイル名を更新する処理
+export async function updateFileName({ id, newName }: { id: number; newName: string }): Promise<FileData[]> {
+  const file = await db.update(files)
+    .set({ name: newName })
+    .where(eq(files.id, id))
+    .returning();
+
+  return file;
 }
 
 export async function deleteFile({ id }: { id: number }): Promise<void> {
@@ -94,11 +97,10 @@ export async function createInvite(): Promise<string> {
 }
 
 export async function getFiles(code: string): Promise<FileData[]> {
-  const id = await getInviteId(code);
+  const inviteId = await getInviteId(code);
   const result = await db.select()
     .from(files)
-    .where(eq(files.id, id))
-    .limit(1);
+    .where(eq(files.inviteId, inviteId))
 
   return result;
 }
