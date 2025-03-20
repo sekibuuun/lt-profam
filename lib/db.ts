@@ -53,9 +53,16 @@ export async function updateFileName({ id, newName }: { id: number; newName: str
   return file;
 }
 
-export async function deleteFile({ id }: { id: number }): Promise<void> {
-  void id;
-  // ダミー実装: ファイルを削除する処理
+export async function deleteFile({ id }: { id: number }): Promise<FileData[]> {
+  const file = await db.delete(files)
+    .where(eq(files.id, id))
+    .returning();
+
+  if (!file.length) {
+    throw new Error(`File with ID ${id} not found`);
+  }
+
+  return file;
 }
 
 export async function saveInvite({ id }: { id: number }): Promise<void> {
